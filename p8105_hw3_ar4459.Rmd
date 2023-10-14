@@ -205,3 +205,31 @@ excellent_plot
 
 The plot shows the average value of data over time for each state. We see there is an overall slight negative trends. As time passes by, the average data value decreases slightly. However, the plot also shows the that each state has variable average data value throughout the year with sharp increases and deceases. 
 
+
+
+Two-panel plot
+
+```{r}
+val_06_10_df =
+  brfss_df |> 
+  filter(year == 2006 | year == 2010, state == "NY") |> 
+  group_by(data_value, response, county) 
+
+val_06_10_plot = 
+  val_06_10_df |> 
+  ggplot(aes(x = response, y = data_value)) +
+  geom_boxplot() +
+  labs(
+    title = "2006 vs. 2010",
+    color = "Year",
+    x = "Response",
+    y = "Value"
+  ) +
+  facet_grid(. ~ year)
+
+val_06_10_plot
+
+```
+The two panel plots shows us similarities between 2006 and 2010. For example, we see that those that responded  that their health was poor had a low data value. Those that responded they had excellent health had lower data value than those that responded good or very good; this was see in 2006 and 2010. Overall, the data value aligned with the response provided regarding their health except for those who responded they had excellent health. 
+
+
