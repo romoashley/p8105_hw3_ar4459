@@ -1,0 +1,115 @@
+---
+title: "p8105_hw3_ar4459"
+author: "ASHLEY ROMO"
+date: "2023-10-13"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+library(patchwork)
+
+# setting the width and height of the plots
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+```
+
+
+## Problem 1
+
+```{r}
+
+library(p8105.datasets)
+
+data("instacart")
+```
+
+There are a total of 1,384,617 rows and 15 columns. The structure of the data is contains many ids including order_id, product_id, user_id, aisle_id, and department_id. Some key variables include product names, order_hour_of_day, and reordered because they describe at what time during the day specific products are purchased or reordered, which can help the store advertise the most sold items during the hours they are most often purchased or reordered.
+
+```{r}
+instacart_df = instacart
+ 
+# number of aisles 
+total_aisle = instacart_df |> 
+  select(aisle) |> distinct()
+nrow(total_aisle)
+
+
+# aisles with the most items ordered from
+most_ordered = instacart_df |> 
+  group_by(aisle) |> 
+  summarise(n_count=n()) |> 
+  arrange(-n_count) |> 
+  filter(row_number() == 1)
+```
+
+
+The total number of aisles is `r nrow(total_aisle)`. The aisle with the most ordered from is `r most_ordered`.
+
+### Problem 1 (ANSWER KEY)
+
+#### Read in the data
+
+```{r}
+data("instacart")
+
+instacart = 
+  instacart |> 
+  as_tibble()
+```
+
+#### Answer questions about the data
+
+This dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns, with each row resprenting a single product from an instacart order. Variables include identifiers for user, order, and product; the order in which each product was added to the cart. There are several order-level variables, describing the day and time of the order, and number of days since prior order. Then there are several item-specific variables, describing the product name (e.g. Yogurt, Avocado), department (e.g. dairy and eggs, produce), and aisle (e.g. yogurt, fresh fruits), and whether the item has been ordered by this user in the past. In total, there are `r instacart |> select(product_id) |> distinct() |> count()` products found in `r instacart |> select(user_id, order_id) |> distinct() |> count()` orders from `r instacart |> select(user_id) |> distinct() |> count()` distinct users.
+
+Below is a table summarizing the number of items ordered from aisle. In total, there are 134 aisles, with fresh vegetables and fresh fruits holding the most items ordered by far.
+
+```{r}
+instacart |> 
+  count(aisle) |> 
+  arrange(desc(n))
+```
+
+Next is a plot that shows the number of items ordered in each aisle. Here, aisles are ordered by ascending number of items.
+
+```{r}
+instacart |> 
+  count(aisle) |> 
+  filter(n > 10000) |> 
+  mutate(aisle = fct_reorder(aisle, n)) |> 
+  ggplot(aes(x = aisle, y = n)) + 
+  geom_point() + 
+  labs(title = "Number of items ordered in each aisle") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+```
+
+Our next table shows the three most popular items in aisles `baking ingredients`, `dog food care`, and `packaged vegetables fruits`, and includes the number of times each item is ordered in your table.
+
+```{r}
+instacart |> 
+  filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) |>
+  group_by(aisle) |> 
+  count(product_name) |> 
+  mutate(rank = min_rank(desc(n))) |> 
+  filter(rank < 4) |> 
+  arrange(desc(n)) |>
+  knitr::kable()
+```
+
+Finally is a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week. This table has been formatted in an untidy manner for human readers. Pink Lady Apples are generally purchased slightly earlier in the day than Coffee Ice Cream, with the exception of day 5.
+
+```{r}
+instacart |>
+  filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) |>
+  group_by(product_name, order_dow) |>
+  summarize(mean_hour = mean(order_hour_of_day)) |>
+  pivot_wider(
+    names_from = order_dow, 
+    values_from = mean_hour) |>
+  knitr::kable(digits = 2)
+```
+
