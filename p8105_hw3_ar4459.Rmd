@@ -326,3 +326,37 @@ Those with more than a high school education appear to be younger than those wit
 The average age of those with an education equivalent to a high school education is `r mean(pull(sex_ed_df |> filter(education == "High school equivalent"), age))`. The average age of women with an education equivalent to a high school degrees is `r mean(pull(sex_ed_df |> filter(sex == "female", education == "High school equivalent"), age))` while the average age of men with an education equivalent to a high school degree is `r mean(pull(sex_ed_df |> filter(sex == "male", education == "High school equivalent"), age))`.
 
 The average age of those with less than a high school education is `r mean(pull(sex_ed_df |> filter(education == "Less than high school"), age))`. The average age of women with less than a high school education is `r mean(pull(sex_ed_df |> filter(sex == "female", education == "Less than high school"), age))` while the average age of men with less than a high school education is `r mean(pull(sex_ed_df |> filter(sex == "male", education == "Less than high school"), age))`.
+
+Total activity for each participant
+
+```{r}
+total_activity_df =
+  merged_df |> 
+  group_by(seqn, age, sex, education) |> 
+  summarize(
+    total_act = sum(phys_act)) |>
+  drop_na() 
+
+total_activity_plot = 
+  total_activity_df |> 
+  ggplot(aes(x = age, y = total_act,  color = sex)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "Total Activity For Each Participant Over The Day",
+    x = "Age",
+    y = "Total Activity",
+    color = "Sex"
+  ) +
+  facet_grid(. ~ education)
+
+total_activity_plot
+```
+Across all education levels, total activity decreases as age increases. Among those with a high school equivalent or more than a high school education, women appear to have a higher total activity compared to men. Among those with less than a high school education, men appear to have higher total activity. 
+
+Those with less than a high school education have a average age of `r mean(pull(total_activity_df |> filter(education == "Less than high school"), age))`. Within this education category, women have an average age of `r mean(pull(total_activity_df |> filter(sex == "female", education == "Less than high school"), age))` and men have an average age of `r mean(pull(total_activity_df |> filter(sex == "female", education == "Less than high school"), age))`.
+
+Those with a high school equivalent education have an average age of `r mean(pull(total_activity_df |> filter(education == "High school equivalent"), age))`. Within this education cateogry, women have an average age of `r mean(pull(total_activity_df |> filter(sex == "female", education == "High school equivalent"), age))` and men have an average age of `r mean(pull(total_activity_df |> filter(sex == "male", education == "High school equivalent"), age))`.
+
+Lastly, those with more than a high school education have an average age of `r mean(pull(total_activity_df |> filter(education == "More than high school"), age))`. Within this category, women have an average age of `r mean(pull(total_activity_df |> filter(sex == "female", education == "More than high school"), age))` and men have an average age of `r mean(pull(total_activity_df |> filter(sex == "male", education == "More than high school"), age))`.
+
