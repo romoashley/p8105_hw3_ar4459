@@ -141,3 +141,67 @@ brfss_df =
     )
 
 ```
+
+```{r}
+#states observed at 7 or more locations in 2002
+states_2002 =
+  brfss_df |> 
+  filter(year == 2002) |> 
+  select(year, state, county) |> 
+  distinct(year, state, county) |> 
+  group_by(year, state) |> 
+  summarize(n_obs = n()) |> 
+  filter(n_obs >= 7) 
+  
+nrow(states_2002)
+  
+
+#states observed at 7 or more location in 2010
+states_2010 =
+  brfss_df |> 
+  filter(year == 2010) |> 
+  select(year, state, county) |> 
+  distinct(year, state, county) |> 
+  group_by(year, state) |> 
+  summarize(n_obs = n()) |> 
+  filter(n_obs >= 7) 
+
+nrow(states_2010)
+```
+
+In 2002, `r nrow(states_2002)` states were observed at 7 or more locations. These states include CT, FL, MA, NC, NJ, and PA. 
+
+In 2010, `r nrow(states_2010)` states were observed at 7 or more locations. These states include CA, CO, FL, MA, MD, NC, NE, NJ, NY, OH, PA, SC, TX, and WA. 
+
+
+Spaghetti plot of the average  data value over time within a state.
+
+```{r}
+excellent_df = 
+  brfss_df |> 
+  filter(response == "Excellent") |> 
+  select(year, state, data_value) |> 
+  group_by(year, state) |> 
+  summarise(
+   avg_data_val = mean(data_value)
+  ) 
+
+excellent_plot = 
+  excellent_df |> 
+  ggplot(aes(x = year, y = avg_data_val, color = state)) +
+  geom_line() + 
+  theme(legend.position ="right") +
+  labs(
+    title = "Average data value over time",
+    x = "Year",
+    y = "Average data value",
+    color = "State"
+  )
+
+
+excellent_plot
+
+```
+
+The plot shows the average value of data over time for each state. We see there is an overall slight negative trends. As time passes by, the average data value decreases slightly. However, the plot also shows the that each state has variable average data value throughout the year with sharp increases and deceases. 
+
