@@ -233,3 +233,50 @@ val_06_10_plot
 The two panel plots shows us similarities between 2006 and 2010. For example, we see that those that responded  that their health was poor had a low data value. Those that responded they had excellent health had lower data value than those that responded good or very good; this was see in 2006 and 2010. Overall, the data value aligned with the response provided regarding their health except for those who responded they had excellent health. 
 
 
+## Problem 3
+
+First, load the data
+
+```{r}
+accel_df = read_csv("data/nhanes_accel.csv") |> 
+  janitor::clean_names() |> 
+  pivot_longer(
+    min1:min1440, 
+    names_prefix = "min",
+    names_to = "min",
+    values_to = "phys_act"
+  )
+
+
+covar_df = read_csv("data/nhanes_covar.csv", skip = 4) |> 
+  janitor::clean_names() |> 
+  drop_na() |> 
+  mutate(
+     sex = case_match(
+       sex,
+        1 ~ "male",
+       2 ~ "female"
+     ),
+     education = case_match(
+        education,
+       1 ~ "Less than high school",
+       2 ~ "High school equivalent",
+       3 ~ "More than high school"
+     )
+  ) |> 
+  mutate(
+    education = factor(
+      education, 
+      levels = c("Less than high school", "High school equivalent", "More than high school")
+      )
+    ) |> 
+  filter(age >= "21") 
+
+```
+
+Now, we merge the two datasets. 
+
+```{r}
+merged_df = left_join(covar_df, accel_df)
+```
+
