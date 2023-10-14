@@ -300,4 +300,29 @@ sex_df
 ```
 The table shows the number of men and women in each education category. Overall, the education category with those with more than high school education had the greatest number of individuals while the education category with those with less than high school education had the fewest number of individuals. There are more women than men in the education category of more than high school education. There are more male in the education category of those with a high school equivalent category. There are more women in the education category with less than high school education.
 
+Visualization of the age distribution for men and women in each education category
 
+```{r}
+sex_ed_df = 
+  covar_df |> 
+  group_by(sex, education) 
+  
+sex_ed_plot =
+  sex_ed_df |> 
+  ggplot(aes(x = age, fill = sex)) +
+  geom_density(alpha = 0.7) +
+  labs(
+    title = "Age Distribution For Men and Women Per Education Category",
+    x = "Age",
+    color = "Sex") +
+  facet_grid(. ~ education) 
+
+sex_ed_plot
+
+```
+
+Those with more than a high school education appear to be younger than those with a high school equivalent or less than a high school education. There are also more females than males in the more than high school education. The average age of women with more than a high school education is `r mean(pull(sex_ed_df |> filter(sex == "female", education == "More than high school"), age))` while the mean age of men with more than a high school education is `r mean(pull(sex_ed_df |> filter(sex == "male", education == "More than high school"), age))`. The mean age of those with more than a high school education is `r mean(pull(sex_ed_df |> filter(education == "More than high school"), age))`.
+
+The average age of those with an education equivalent to a high school education is `r mean(pull(sex_ed_df |> filter(education == "High school equivalent"), age))`. The average age of women with an education equivalent to a high school degrees is `r mean(pull(sex_ed_df |> filter(sex == "female", education == "High school equivalent"), age))` while the average age of men with an education equivalent to a high school degree is `r mean(pull(sex_ed_df |> filter(sex == "male", education == "High school equivalent"), age))`.
+
+The average age of those with less than a high school education is `r mean(pull(sex_ed_df |> filter(education == "Less than high school"), age))`. The average age of women with less than a high school education is `r mean(pull(sex_ed_df |> filter(sex == "female", education == "Less than high school"), age))` while the average age of men with less than a high school education is `r mean(pull(sex_ed_df |> filter(sex == "male", education == "Less than high school"), age))`.
