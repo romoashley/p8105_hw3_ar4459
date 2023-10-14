@@ -360,3 +360,23 @@ Those with a high school equivalent education have an average age of `r mean(pul
 
 Lastly, those with more than a high school education have an average age of `r mean(pull(total_activity_df |> filter(education == "More than high school"), age))`. Within this category, women have an average age of `r mean(pull(total_activity_df |> filter(sex == "female", education == "More than high school"), age))` and men have an average age of `r mean(pull(total_activity_df |> filter(sex == "male", education == "More than high school"), age))`.
 
+
+24-hour activity time courses for each education level by sex
+
+```{r}
+merged_df |> 
+  drop_na() |> 
+  ggplot(aes(x = min, y = phys_act,  color = sex, group = seqn)) +
+  geom_line( alpha = 0.2) +
+  facet_grid(. ~ education) +
+  geom_smooth(aes(group = sex), se = FALSE) +
+  labs(
+    title = "24-hour Activity For Each Education Level By Sex",
+    x = "Minutes",
+    y = "Activity"
+  )
+```
+
+The trend in activity is similar across all education levels. The activity increases, makes a share decrease, and then increase again across all education levels. I conclude that individuals across education level have a similar activity level. 
+
+The mean activity for those with less than high school education is `r mean(pull(merged_df |> drop_na() |> filter(education == "Less than high school"), phys_act))`. The mean for those with a high school equivalent education is `r mean(pull(merged_df |> drop_na() |> filter(education == "High school equivalent"), phys_act))`. The activity for those with more than a high school education is `r mean(pull(merged_df |> drop_na() |> filter(education == "More than high school"), phys_act))`.
