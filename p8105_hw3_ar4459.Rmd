@@ -113,3 +113,31 @@ instacart |>
   knitr::kable(digits = 2)
 ```
 
+
+#Problem 2
+
+First, I load the BRFSS data.
+
+```{r}
+library(p8105.datasets)
+data("brfss_smart2010")
+```
+
+Now, I will do some data cleaning
+
+```{r}
+brfss_df = 
+  brfss_smart2010 |> 
+  janitor::clean_names() |> 
+  select(
+    year, state = locationabbr, county = locationdesc, everything()
+    ) |> 
+  filter(
+    topic == "Overall Health",
+    response == "Poor" | response == "Fair"| response == "Good"| response == "Very good"| response == "Excellent"
+    ) |> 
+  mutate(
+    response = factor(response, levels = c("Poor", "Fair", "Good", "Very good", "Excellent"))
+    )
+
+```
